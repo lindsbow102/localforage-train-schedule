@@ -34,7 +34,7 @@ document.getElementById("add-train").addEventListener("click", function(event) {
                               // append train info to new row in the table body
                               document.getElementById("trainTableBody").insertAdjacentHTML(
                                   "beforeend",
-                                  "<tr> <td>" +
+                                  "<tr id='train-data'> <td>" +
                                     value +
                                     "</td> <td>" +
                                     dvalue +

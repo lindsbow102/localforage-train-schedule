@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="jumbotron">
+          <h1>All Aboard the Choo Choo Train!</h1>
+          <p>"Life is the train, and not the station."</p>
+        </div>
+      </div>
+    </header>
+    <div class="container" id="train-schedule">
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><h3>Current Train Schedule</h3></div>
+
+        <!-- Table -->
+        <table class="table table-hover" id="trainTable">
+          <thead>
+            <tr>
+              <th>Train Name</th>
+              <th>Destination</th>
+              <th>Frequency (min)</th>
+              <th>Next Arrival</th>
+              <th>Minutes Away</th>
+            </tr>
+          </thead>
+          <tbody id="trainTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="container">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Add Train</h3></div>
+        <div class="panel-body">
+          <!-- Sign-up Form (note the various input "types") -->
+          <form role="form">
+            <div class="form-group">
+              <label for="name-input">Train Name:</label>
+              <input class="form-control" id="name-input" type="text" />
+            </div>
+            <div class="form-group">
+              <label for="destination-input">Destination:</label>
+              <input class="form-control" id="destination-input" type="text" />
+            </div>
+            <div class="form-group">
+              <label for="first-train-input"
+                >First Train Time (HH:mm--military time):</label
+              >
+              <input class="form-control" id="first-train-input" type="text" />
+            </div>
+            <div class="form-group">
+              <label for="frequency-input">Frequency (min):</label>
+              <input class="form-control" id="frequency-input" type="text" />
+            </div>
+            <button class="btn btn-primary" id="add-train" type="submit">
+              Submit
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.rawgit.com/mozilla/localForage/master/dist/localforage.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script>
+
+      document.getElementById("add-train").addEventListener("click", function(event) {
+          event.preventDefault();
+
+          // Variables for user input
+          let name = document.getElementById("name-input").value.trim();
+          let destination = document.getElementById("destination-input").value.trim();
+          let trainTime = moment(document.getElementById("first-train-input").value.trim(), "HH:mm").subtract(1, "years").format("X"); // converts this to unix time
+          let frequency = document.getElementById("frequency-input").value.trim();
+
+          var remainder = moment().diff(moment.unix(trainTime), "minutes") % frequency;
+          var minutes = frequency - remainder;
+          var arrival = moment().add(minutes, "m").format("hh:mm A");
+
+          // set and get value for train name
+          localforage.setItem("name", name).then(function() {
+            localforage.getItem("name").then(function(value) {
+              console.log("Train name: " + value);
+
+              // set and get value for destination
+              localforage.setItem("destination", destination).then(function() {
+                localforage.getItem("destination").then(function(dvalue) {
+                    console.log("Train destination: " + dvalue);
+
+                    //set and get value for first train time
+                    localforage.setItem("trainTime", trainTime).then(function() {
+                        localforage.getItem("trainTime").then(function(tvalue) {
+                            console.log("First train: " + tvalue);
+
+                            // set and get value for frequency
+                            localforage.setItem("frequency", frequency).then(function() {
+                                localforage.getItem("frequency").then(function(fvalue) {
+                                    console.log("Train frequency: " + fvalue);
+
+                                    // append train info to new row in the table body
+                                    document.getElementById("trainTableBody").insertAdjacentHTML(
+                                        "beforeend",
+                                        "<tr> <td>" +
+                                          value +
+                                          "</td> <td>" +
+                                          dvalue +
+                                          "</td> <td>" +
+                                          fvalue +
+                                          "</td> <td>" +
+                                          arrival +
+                                          "</td> <td>" +
+                                          minutes +
+                                          "</td> </tr>"
+                                      );
+                                    return fvalue;
+                                  });
+                              });
+                            return tvalue;
+                          });
+                      });
+                    return dvalue;
+                  });
+                return value;
+              });
+            });
+          });
+
+          alert("Train has been added!");
+
+          // Clear user input fiels
+          document.getElementById("name-input").value = "";
+          document.getElementById("destination-input").value = "";
+          document.getElementById("first-train-input").value = "";
+          document.getElementById("frequency-input").value = "";
+        });
+    </script>
+  </body>
+</html>

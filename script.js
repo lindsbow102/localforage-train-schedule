@@ -4,7 +4,8 @@ document.getElementById("add-train").addEventListener("click", function(event) {
     // Variables for user input
     let name = document.getElementById("name-input").value.trim();
     let destination = document.getElementById("destination-input").value.trim();
-    let trainTime = moment(document.getElementById("first-train-input").value.trim(), "HH:mm").subtract(1, "years").format("X"); // converts this to unix time
+    // converts this to unix time
+    let trainTime = moment(document.getElementById("first-train-input").value.trim(), "HH:mm").subtract(1, "years").format("X"); 
     let frequency = document.getElementById("frequency-input").value.trim();
 
     var remainder = moment().diff(moment.unix(trainTime), "minutes") % frequency;
